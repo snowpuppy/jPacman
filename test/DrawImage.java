@@ -10,10 +10,11 @@ class MyCanvas extends JComponent {
 
     Image maze = Toolkit.getDefaultToolkit().getImage("../images/maze.png");
     Image pacman = Toolkit.getDefaultToolkit().getImage("../images/pacman.png");
-    Image blinky = Toolkit.getDefaultToolkit().getImage("../images/blinky.png");
-    Image pinky = Toolkit.getDefaultToolkit().getImage("../images/pinky.png");
-    Image inky = Toolkit.getDefaultToolkit().getImage("../images/inky.png");
-    Image clyde = Toolkit.getDefaultToolkit().getImage("../images/clyde.png");
+    Ghost blinky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/blinky.png"), 330, 270);
+    Ghost pinky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/pinky.png"), 330, 300);
+    Ghost inky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/inky.png"), 360, 270);
+    Ghost clyde = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/clyde.png"), 360, 300);
+    Image dot = Toolkit.getDefaultToolkit().getImage("../images/dot.png");
 
     public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -21,11 +22,23 @@ class MyCanvas extends JComponent {
         g2.drawImage(maze, 0, 0, this);
         g2.drawImage(pacman, 0, 30, this);
         g2.drawImage(pacman, 60,30, 60+30, 60, 0, 0, 30, 30, this);
-        g2.drawImage(blinky, 0, 60, this);
-        g2.drawImage(pinky, 0, 90, this);
-        g2.drawImage(inky, 0, 120, this);
-        g2.drawImage(clyde, 0, 150, this);
+        g2.drawImage(blinky.image, blinky.x, blinky.y, this);
+        g2.drawImage(pinky.image, pinky.x, pinky.y, this);
+        g2.drawImage(inky.image, inky.x, inky.y, this);
+        g2.drawImage(clyde.image, clyde.x, clyde.y, this);
+        g2.drawImage(dot, 0, 170, this);
         g2.finalize();
+    }
+}
+
+class Ghost {
+    public Image image = null;
+    public int x = 0, y = 0;
+
+    public Ghost(Image image, int x, int y) {
+        this.image = image;
+        this.x = x;
+        this.y = y;
     }
 }
 
