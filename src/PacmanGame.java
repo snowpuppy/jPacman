@@ -10,8 +10,15 @@ import javax.swing.Timer;
 
 import java.awt.event.ActionListener;
 
-class MyCanvas extends JComponent implements ActionListener, KeyListener {
+class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
 
+    // Refresh rate (in milliseconds).
+    public static final int REFRESH_RATE = 50;
+    // Key Constants
+    public static final int KEY_UP = KeyEvent.VK_UP;
+    public static final int KEY_DOWN = KeyEvent.VK_DOWN;
+    public static final int KEY_LEFT = KeyEvent.VK_LEFT;
+    public static final int KEY_RIGHT = KeyEvent.VK_RIGHT;
     // Maze width and height
     public static final int MW = 27;
     public static final int MH = 16;
@@ -37,6 +44,9 @@ class MyCanvas extends JComponent implements ActionListener, KeyListener {
   1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
+    // The timer
+    public static Timer redrawTimer = null;
+
     // There are 164 dots. Subtract 4 for ghosts,
     // 2 for empty positions above ghosts, and
     // subtract one for pacman.
@@ -48,7 +58,7 @@ class MyCanvas extends JComponent implements ActionListener, KeyListener {
     Ghost inky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/inky.png"), 360, 270);
     Ghost clyde = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/clyde.png"), 360, 300);
 
-    public MyCanvas() {
+    public PacmanCanvas() {
         super();
         int k = 0;
         for (int i = 0; i < MH; i++) {
@@ -73,6 +83,8 @@ class MyCanvas extends JComponent implements ActionListener, KeyListener {
         }
         setFocusable(true);
         addKeyListener(this);
+        redrawTimer = new Timer(REFRESH_RATE,this);
+        redrawTimer.start();
     }
 
     public void paint(Graphics g) {
@@ -103,13 +115,26 @@ class MyCanvas extends JComponent implements ActionListener, KeyListener {
     }
 
     public void keyPressed(KeyEvent e) {
-        System.out.println("Key Pressed.");
+        int keyCode = e.getKeyCode();
+        if (keyCode == KEY_UP) {
+            //System.out.println("Key Up.");
+            pacman.y -= 1;
+        } else if (keyCode == KEY_DOWN) {
+            //System.out.println("Key Down.");
+            pacman.y += 1;
+        } else if (keyCode == KEY_RIGHT) {
+            //System.out.println("Key Right.");
+            pacman.x += 1;
+        } else if (keyCode == KEY_LEFT) {
+            //System.out.println("Key Left.");
+            pacman.x -= 1;
+        }
     }
     public void keyReleased(KeyEvent e) {
-        System.out.println("Key Released.");
+        //System.out.println("Key Released.");
     }
     public void keyTyped(KeyEvent e) {
-        System.out.println("Key Typed.");
+        //System.out.println("Key Typed.");
     }
 }
 
@@ -150,14 +175,14 @@ class Dot {
     }
 }
 
-public class DrawImage {
+public class PacmanGame {
     public static final int SCREEN_X = 800, SCREEN_Y = 600;
 
     public static void main(String[] a) {
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setBounds(30, 30, SCREEN_X, SCREEN_Y);
-        window.getContentPane().add(new MyCanvas());
+        window.getContentPane().add(new PacmanCanvas());
         window.setVisible(true);
     }
 }

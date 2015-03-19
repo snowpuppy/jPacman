@@ -1,4 +1,7 @@
 build:
 	javac DrawImage.java
-run:
+DrawImage.class: build
+run: DrawImage.class
 	java DrawImage
+clean:
+	rm *.class
