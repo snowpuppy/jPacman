@@ -91,12 +91,6 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
         Graphics2D g2 = (Graphics2D) g;
 
         g2.drawImage(maze, 0, 0, this);
-        //g2.drawImage(pacman, 360, 420, this);
-        g2.drawImage(pacman.image, pacman.x, pacman.y, pacman.x+30, pacman.y+30, 0, 0, 30, 30, this);
-        g2.drawImage(blinky.image, blinky.x, blinky.y, this);
-        g2.drawImage(pinky.image, pinky.x, pinky.y, this);
-        g2.drawImage(inky.image, inky.x, inky.y, this);
-        g2.drawImage(clyde.image, clyde.x, clyde.y, this);
         // Draw all of the dots if they should be
         // shown.
         for (int i = 0; i < dots.length; i++) {
@@ -104,6 +98,12 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
                 g2.drawImage(dots[i].image, dots[i].x, dots[i].y, this);
             }
         }
+        g2.drawImage(pacman.image, pacman.x, pacman.y, pacman.x+pacman.w, pacman.y+pacman.h,
+                                   pacman.fx, pacman.fy, pacman.fx+pacman.w, pacman.fy+pacman.h, this);
+        g2.drawImage(blinky.image, blinky.x, blinky.y, this);
+        g2.drawImage(pinky.image, pinky.x, pinky.y, this);
+        g2.drawImage(inky.image, inky.x, inky.y, this);
+        g2.drawImage(clyde.image, clyde.x, clyde.y, this);
         g2.finalize();
     }
 
@@ -118,18 +118,31 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
         int keyCode = e.getKeyCode();
         if (keyCode == KEY_UP) {
             //System.out.println("Key Up.");
-            pacman.y -= 1;
+            if (this.m[MW*((pacman.y-1-SY)/30) + pacman.x/30] == 0) {
+                pacman.y -= 1;
+                pacman.animate(Pacman.UP);
+            }
         } else if (keyCode == KEY_DOWN) {
             //System.out.println("Key Down.");
-            pacman.y += 1;
+            if (this.m[MW*((pacman.y+30-SY)/30) + pacman.x/30] == 0) {
+                pacman.y += 1;
+                pacman.animate(Pacman.DOWN);
+            }
         } else if (keyCode == KEY_RIGHT) {
             //System.out.println("Key Right.");
-            pacman.x += 1;
+            if (this.m[MW*((pacman.y-SY)/30) + (pacman.x+30)/30] == 0) {
+                pacman.x += 1;
+                pacman.animate(Pacman.RIGHT);
+            }
         } else if (keyCode == KEY_LEFT) {
             //System.out.println("Key Left.");
-            pacman.x -= 1;
+            if (this.m[MW*((pacman.y-SY)/30) + (pacman.x-1)/30] == 0) {
+                pacman.x -= 1;
+                pacman.animate(Pacman.LEFT);
+            }
         }
     }
+
     public void keyReleased(KeyEvent e) {
         //System.out.println("Key Released.");
     }
@@ -139,13 +152,35 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
 }
 
 class Pacman {
+    public static final int RIGHT = 0;
+    public static final int LEFT = 1;
+    public static final int UP = 2;
+    public static final int DOWN = 3;
     public Image image = null;
     public int x = 0, y = 0;
+    static final int w = 30, h = 30;
+    public int fx = 0, fy = 0;
 
     public Pacman(Image image, int x, int y) {
         this.image = image;
         this.x = x;
         this.y = y;
+    }
+
+    public void animate(int dir) {
+        // update the x coordinate for the
+        // frame. (Frames only extend in x-direction)
+        if (this.fx == 0) {
+            this.fx = 30;
+        }
+        else {
+            this.fx = 0;
+        }
+        // y-coordinate of frame depends on
+        // direction passed in.
+        if (dir >= RIGHT && dir <= DOWN) {
+            this.fy = 30*dir;
+        }
     }
 }
 
