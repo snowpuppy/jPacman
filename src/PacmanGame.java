@@ -16,7 +16,7 @@ import java.lang.Math;
 class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
 
     // Refresh rate (in milliseconds).
-    public static final int REFRESH_RATE = 50;
+    public static final int REFRESH_RATE = 20;
     // Key Constants
     public static final int KEY_UP = KeyEvent.VK_UP;
     public static final int KEY_DOWN = KeyEvent.VK_DOWN;
@@ -53,6 +53,8 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
     // The timer
     public static Timer redrawTimer = null;
 
+    // Move variable for pacman
+    public int moveDirection = -1;
     // There are 164 dots. Subtract 4 for ghosts,
     // 2 for empty positions above ghosts, and
     // subtract one for pacman.
@@ -119,14 +121,39 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        // Move player
+        move();    
         // Update AI positions
-        
         // Re-Draw the screen.
         this.repaint();
     }
 
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
+        if (keyCode == KEY_UP || keyCode == KEY_DOWN ||
+            keyCode == KEY_RIGHT || keyCode == KEY_LEFT) {
+            this.moveDirection = keyCode;
+        }
+    }
+
+    public void keyReleased(KeyEvent e) {
+        //System.out.println("Key Released.");
+        int keyCode = e.getKeyCode();
+        if (keyCode == KEY_UP || keyCode == KEY_DOWN ||
+            keyCode == KEY_RIGHT || keyCode == KEY_LEFT) {
+            this.moveDirection = -1;
+        }
+    }
+    public void keyTyped(KeyEvent e) {
+        //System.out.println("Key Typed.");
+    }
+
+    private int hashLocation(int x, int y) {
+        return ((y-SY)/GRIDH)*MW + (x-SX)/GRIDW;
+    }
+
+    private void move() {
+        int keyCode = this.moveDirection;
         if (keyCode == KEY_UP) {
             //System.out.println("Key Up.");
             if (this.m[MW*((pacman.y-1-SY)/30) + pacman.x/30] == 0) {
@@ -156,17 +183,6 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
                 hideDots(pacman);
             }
         }
-    }
-
-    public void keyReleased(KeyEvent e) {
-        //System.out.println("Key Released.");
-    }
-    public void keyTyped(KeyEvent e) {
-        //System.out.println("Key Typed.");
-    }
-
-    private int hashLocation(int x, int y) {
-        return ((y-SY)/GRIDH)*MW + (x-SX)/GRIDW;
     }
 
     private List<Dot> collided(int xpos, int ypos, int w, int h) {
