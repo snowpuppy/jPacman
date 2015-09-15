@@ -10,6 +10,7 @@ import javax.swing.Timer;
 
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Stack;
 import java.util.ArrayList;
 import java.lang.Math;
 
@@ -124,6 +125,7 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
         // Move player
         move();    
         // Update AI positions
+        moveGhosts();
         // Re-Draw the screen.
         this.repaint();
     }
@@ -150,6 +152,162 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
 
     private int hashLocation(int x, int y) {
         return ((y-SY)/GRIDH)*MW + (x-SX)/GRIDW;
+    }
+
+    // Frozen Freefall.
+    private void moveGhosts() {
+        // To move the ghosts, I'll  need to
+        // do graph traversal. I shouldn't need
+        // to know the entire extent of the
+        // graph. In this case, since the
+        // graph is so small and contained
+        // in an array in memory, the case
+        // is simple. I can check the array
+        // to see what options are open
+        // and make the ghost move
+        // appropriately.
+
+
+        // Move Pinky (right,down,left,up)
+        if (pinky.x % 30 == 0 && pinky.y % 30 == 0) { // decide next direction
+            // mark this node as visited.
+            pinky.visited[MW*((pinky.y-SY)/30) + pinky.x/30] = 1;
+
+            // get availability infonmation (occupied/unoccupied)
+            int gaUp = getUp(this.m,pinky.x,pinky.y);
+            int gaDown = getDown(this.m,pinky.x,pinky.y);
+            int gaLeft = getLeft(this.m,pinky.x,pinky.y);
+            int gaRight = getRight(this.m,pinky.x,pinky.y);
+            // Get visitation info
+            int gvUp = getUp(pinky.visited,pinky.x,pinky.y);
+            int gvDown = getDown(pinky.visited,pinky.x,pinky.y);
+            int gvLeft = getLeft(pinky.visited,pinky.x,pinky.y);
+            int gvRight = getRight(pinky.visited,pinky.x,pinky.y);
+
+            //System.out.printf("gaUp: %3d, gaDown: %3d, gaLeft: %3d, gaRight: %3d\n", gaUp, gaDown, gaLeft, gaRight);
+            //System.out.printf("gvUp: %3d, gvDown: %3d, gvLeft: %3d, gvRight: %3d\n", gvUp, gvDown, gvLeft, gvRight);
+            /*
+            String d = "";
+            if (pinky.direction == pinky.UP) { d = "UP";}
+            if (pinky.direction == pinky.DOWN) { d = "DOWN";}
+            if (pinky.direction == pinky.RIGHT) { d = "RIGHT";}
+            if (pinky.direction == pinky.LEFT) { d = "LEFT";}
+            System.out.println("Direction: " + d);
+            */
+
+            //printMap(this.m, pinky.x/30, ((pinky.y-SY)/30));
+
+            // choose a direction
+            if (gaRight == 0 && gvRight == 0) {
+                pinky.direction = pinky.RIGHT;
+                pinky.stack.push(pinky.LEFT);
+            } else if (gaDown == 0 && gvDown == 0) {
+                pinky.direction = pinky.DOWN;
+                pinky.stack.push(pinky.UP);
+            } else if (gaLeft == 0 && gvLeft == 0) {
+                pinky.direction = pinky.LEFT;
+                pinky.stack.push(pinky.RIGHT);
+            } else if (gaUp == 0 && gvUp == 0) {
+                pinky.direction = pinky.UP;
+                pinky.stack.push(pinky.DOWN);
+            } else if (!pinky.stack.isEmpty()) {
+                // will keep running until empty stack
+                // exception.
+                pinky.direction = pinky.stack.pop();
+            } else {
+                // reset all nodes visited so we can traverse
+                // the maze again. :)
+                for (int i = 0; i < pinky.visited.length; i++) {
+                    pinky.visited[i] = 0;
+                }
+                // reset the direction so that we don't move
+                // this turn. :)
+                pinky.direction = -1;
+            }
+        }
+
+        // move pinky
+        if (pinky.direction == pinky.RIGHT) {
+            pinky.x += 1;
+        } else if (pinky.direction == pinky.LEFT) {
+            pinky.x -= 1;
+        } else if (pinky.direction == pinky.UP) {
+            pinky.y -= 1;
+        } else if (pinky.direction == pinky.DOWN) {
+            pinky.y += 1;
+        }
+
+        // Move Blinky (left,up,right,down)
+        if (blinky.x % 30 == 0 && blinky.y % 30 == 0) { // decide next direction
+            // mark this node as visited.
+            blinky.visited[MW*((blinky.y-SY)/30) + blinky.x/30] = 1;
+
+            // get availability infonmation (occupied/unoccupied)
+            int gaUp = getUp(this.m,blinky.x,blinky.y);
+            int gaDown = getDown(this.m,blinky.x,blinky.y);
+            int gaLeft = getLeft(this.m,blinky.x,blinky.y);
+            int gaRight = getRight(this.m,blinky.x,blinky.y);
+            // Get visitation info
+            int gvUp = getUp(blinky.visited,blinky.x,blinky.y);
+            int gvDown = getDown(blinky.visited,blinky.x,blinky.y);
+            int gvLeft = getLeft(blinky.visited,blinky.x,blinky.y);
+            int gvRight = getRight(blinky.visited,blinky.x,blinky.y);
+
+            //System.out.printf("gaUp: %3d, gaDown: %3d, gaLeft: %3d, gaRight: %3d\n", gaUp, gaDown, gaLeft, gaRight);
+            //System.out.printf("gvUp: %3d, gvDown: %3d, gvLeft: %3d, gvRight: %3d\n", gvUp, gvDown, gvLeft, gvRight);
+            /*
+            String d = "";
+            if (blinky.direction == blinky.UP) { d = "UP";}
+            if (blinky.direction == blinky.DOWN) { d = "DOWN";}
+            if (blinky.direction == blinky.RIGHT) { d = "RIGHT";}
+            if (blinky.direction == blinky.LEFT) { d = "LEFT";}
+            System.out.println("Direction: " + d);
+            */
+
+            //printMap(this.m, blinky.x/30, ((blinky.y-SY)/30));
+
+            // choose a direction
+            if (gaLeft == 0 && gvLeft == 0) {
+                blinky.direction = blinky.LEFT;
+                blinky.stack.push(blinky.RIGHT);
+            } else if (gaUp == 0 && gvUp == 0) {
+                blinky.direction = blinky.UP;
+                blinky.stack.push(blinky.DOWN);
+            } else if (gaRight == 0 && gvRight == 0) {
+                blinky.direction = blinky.RIGHT;
+                blinky.stack.push(blinky.LEFT);
+            } else if (gaDown == 0 && gvDown == 0) {
+                blinky.direction = blinky.DOWN;
+                blinky.stack.push(blinky.UP);
+            } else if (!blinky.stack.isEmpty()) {
+                // will keep running until empty stack
+                // exception.
+                blinky.direction = blinky.stack.pop();
+            } else {
+                // reset all nodes visited so we can traverse
+                // the maze again. :)
+                for (int i = 0; i < blinky.visited.length; i++) {
+                    blinky.visited[i] = 0;
+                }
+                // reset the direction so that we don't move
+                // this turn. :)
+                blinky.direction = -1;
+            }
+        }
+
+        // move blinky
+        if (blinky.direction == blinky.RIGHT) {
+            blinky.x += 1;
+        } else if (blinky.direction == blinky.LEFT) {
+            blinky.x -= 1;
+        } else if (blinky.direction == blinky.UP) {
+            blinky.y -= 1;
+        } else if (blinky.direction == blinky.DOWN) {
+            blinky.y += 1;
+        }
+
+        // Move Inky (shortest distance to pacman (DJ's algo))
+        // Move Clyde (random direction)
     }
 
     private void move() {
@@ -183,6 +341,22 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
                 hideDots(pacman);
             }
         }
+    }
+
+    // Functions to extract relative values
+    // from the map based on the object's
+    // screen coordinates.
+    private int getUp(int[] arr, int x, int y) {
+        return arr[MW*((y-1-SY)/30) + x/30];
+    }
+    private int getDown(int[] arr, int x, int y) {
+        return arr[MW*((y+30-SY)/30) + x/30];
+    }
+    private int getRight(int[] arr, int x, int y) {
+        return arr[MW*((y-SY)/30) + (x+30)/30];
+    }
+    private int getLeft(int[] arr, int x, int y) {
+        return arr[MW*((y-SY)/30) + (x-1)/30];
     }
 
     private List<Dot> collided(int xpos, int ypos, int w, int h) {
@@ -236,6 +410,29 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
             }
         }
     }
+
+    void printMap(int[] map, int x, int y) {
+        System.out.printf("[ ");
+        for (int i = 0; i < MH; i++) {
+            if (i != 0) {
+                System.out.printf("  ");
+            }
+            for (int j = 0; j < MW; j++) {
+                if (j != 0) {
+                    System.out.printf(", ");
+                }
+                if (i == y && j == x) {
+                    // this indicates the position in the map
+                    // passed in. :)
+                    System.out.printf("%d", 8);
+                } else {
+                    System.out.printf("%d", map[MW*i + j]);
+                }
+            }
+            System.out.printf("\n");
+        }
+        System.out.printf("]");
+    }
 }
 
 class Pacman {
@@ -272,8 +469,15 @@ class Pacman {
 }
 
 class Ghost {
+    public static final int RIGHT = 0;
+    public static final int LEFT = 1;
+    public static final int UP = 2;
+    public static final int DOWN = 3;
     public Image image = null;
     public int x = 0, y = 0;
+    public int direction = -1;
+    public Stack<Integer> stack = new Stack<Integer>();
+    public int[] visited = new int[PacmanCanvas.m.length];
 
     public Ghost(Image image, int x, int y) {
         this.image = image;
