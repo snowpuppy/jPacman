@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Stack;
 import java.util.ArrayList;
 import java.lang.Math;
+import java.util.Random;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 
 class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
 
@@ -181,10 +185,10 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
         pinky.move(this.m);
         // Move Blinky (left,up,right,down)
         blinky.move(this.m);
-        // Move Inky (shortest distance to pacman (DJ's algo))
-        inky.move(this.m);
-        // Move Clyde (random direction)
-        clyde.move(this.m);
+        // Move Inky (random direction)
+        inky.moveRandom(this.m);
+        // Move Clyde (shortest distance to pacman (BFS))
+        clyde.moveToPacman(this.m, pacman.x, pacman.y);
     }
 
     private void move() {
@@ -372,9 +376,10 @@ class Ghost {
     public Image image = null;
     public int x = 0, y = 0;
     public int direction = -1;
-    public int[] moveOrder = {0, 1, 2, 3};
+    public Integer[] moveOrder = {0, 1, 2, 3};
     public Stack<Integer> stack = new Stack<Integer>();
     public int[] visited = new int[PacmanCanvas.m.length];
+    private Random rand = new Random(System.currentTimeMillis());
 
     public Ghost(Image image, int x, int y) {
         this.image = image;
@@ -400,6 +405,18 @@ class Ghost {
         } else {
             return d-1;
         }
+    }
+
+    private void randomizeMoveOrder() {
+        List<Integer> rList = new ArrayList<Integer>(Arrays.asList(moveOrder));
+        for (int i = moveOrder.length; i > 0; i--) {
+            moveOrder[i-1] = rList.remove(rand.nextInt(i));
+        }
+    }
+
+    public void moveRandom(int[] map) {
+        randomizeMoveOrder();
+        move(map);
     }
 
     public void move(int[] map) {
@@ -442,7 +459,7 @@ class Ghost {
             } else if (ga[3] == 0 && gv[3] == 0) {
                 this.direction = this.moveOrder[3];
                 this.stack.push(getOpositeDir(this.moveOrder[3]));
-            } else if (!this.stack.isEmpty()) {
+            } else if (!this.stack.empty()) {
                 // will keep running until empty stack
                 // exception.
                 this.direction = this.stack.pop();
@@ -458,6 +475,10 @@ class Ghost {
             }
         }
 
+        updatePosition();
+    }
+    
+    private void updatePosition() {
         // move this 
         if (this.direction == this.RIGHT) {
             this.x += 1;
@@ -468,7 +489,95 @@ class Ghost {
         } else if (this.direction == this.DOWN) {
             this.y += 1;
         }
+    }
 
+    private int findShortestPath(int[] map, int x, int y) {
+        Deque<Integer> queue = new LinkedList<Integer>();
+        int finalNode = PacmanCanvas.MW*((y-PacmanCanvas.SY)/30) + x/30;
+        int startNode = PacmanCanvas.MW*((this.y-PacmanCanvas.SY)/30) + this.x/30;
+        int node = 0, up = 0, down = 0, left = 0, right = 0;
+
+        // Initialize the visited list
+        for (int i = 0; i < this.visited.length; i++) {
+            this.visited[i] = 0;
+        }
+        // Add initial node to the queue
+        queue.add(startNode);
+
+        // traverse the graph.
+        while (!queue.isEmpty()) {
+            // pick current node.
+            node = queue.remove();
+
+            // Exit if we found our path!
+            // In this scenario with
+            // ghosts and pacman, we
+            // should always find a path.
+            if (node == finalNode) {
+                break;
+            }
+
+            // Decide if a node is valid for the 4
+            // cardinal directions and add all valid
+            // adjacent nodes to the queue
+            up = node - PacmanCanvas.MW;
+            down = node + PacmanCanvas.MW;
+            right = node + 1;
+            left = node - 1;
+            if (up > 0 && map[up] == 0 && visited[up] == 0) {
+                this.visited[up] = node;
+                queue.add(up);
+            }
+            if (down < map.length && map[down] == 0 && visited[down] == 0) {
+                this.visited[down] = node;
+                queue.add(down);
+            }
+            boolean leftValid = (left > 0) &&
+                                (left % PacmanCanvas.MW != PacmanCanvas.MW-1);
+            if (leftValid && map[left] == 0 && visited[left] == 0) {
+                this.visited[left] = node;
+                queue.add(left);
+            }
+            boolean rightValid = (right < map.length) &&
+                                 (right % PacmanCanvas.MW != 0);
+            if (rightValid && map[right] == 0 && visited[right] == 0) {
+                this.visited[right] = node;
+                queue.add(right);
+            }
+        }
+        
+        // If we didn't find a path.
+        // (Shouldn't happen...)
+        // then return LEFT.
+        // Worst case the ghost
+        // goes round in circles.
+        int ret = this.LEFT;
+        if (!queue.isEmpty()) {
+            // backtrack to find the node
+            // leading to the shortest
+            // path.
+            int n = node;
+            while (visited[n] != startNode) {
+                n = visited[n];
+            }
+            // Find out which direction that node
+            // is relative to the start position.
+            if (n == startNode - PacmanCanvas.MW) {
+                ret = this.UP;
+            } else if (n == startNode + PacmanCanvas.MW) {
+                ret = this.DOWN;
+            } else if (n == startNode-1) {
+                ret = this.LEFT;
+            } else if (n == startNode+1) {
+                ret = this.RIGHT;
+            } 
+        }
+        return ret;
+    }
+
+    public void moveToPacman(int[] map, int x, int y) {
+        this.direction = findShortestPath(map,x,y);
+        updatePosition();
     }
 }
 
