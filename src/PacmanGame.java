@@ -195,28 +195,36 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
         int keyCode = this.moveDirection;
         if (keyCode == KEY_UP) {
             //System.out.println("Key Up.");
-            if (this.m[MW*((pacman.y-1-SY)/30) + pacman.x/30] == 0) {
+            // The +15 to x centers the collision detection to pacman's
+            // center when checking for walls.
+            if (this.m[MW*((pacman.y-1-SY)/30) + (pacman.x+15)/30] == 0) {
                 pacman.y -= 1;
                 pacman.animate(Pacman.UP);
                 hideDots(pacman);
             }
         } else if (keyCode == KEY_DOWN) {
             //System.out.println("Key Down.");
-            if (this.m[MW*((pacman.y+30-SY)/30) + pacman.x/30] == 0) {
+            // The +15 to x centers the collision detection to pacman's
+            // center when checking for walls.
+            if (this.m[MW*((pacman.y+30-SY)/30) + (pacman.x+15)/30] == 0) {
                 pacman.y += 1;
                 pacman.animate(Pacman.DOWN);
                 hideDots(pacman);
             }
         } else if (keyCode == KEY_RIGHT) {
+            // The +15 to y centers the collision detection to pacman's
+            // center when checking for walls.
             //System.out.println("Key Right.");
-            if (this.m[MW*((pacman.y-SY)/30) + (pacman.x+30)/30] == 0) {
+            if (this.m[MW*((pacman.y+15-SY)/30) + (pacman.x+30)/30] == 0) {
                 pacman.x += 1;
                 pacman.animate(Pacman.RIGHT);
                 hideDots(pacman);
             }
         } else if (keyCode == KEY_LEFT) {
+            // The +15 to y centers the collision detection to pacman's
+            // center when checking for walls.
             //System.out.println("Key Left.");
-            if (this.m[MW*((pacman.y-SY)/30) + (pacman.x-1)/30] == 0) {
+            if (this.m[MW*((pacman.y+15-SY)/30) + (pacman.x-1)/30] == 0) {
                 pacman.x -= 1;
                 pacman.animate(Pacman.LEFT);
                 hideDots(pacman);
