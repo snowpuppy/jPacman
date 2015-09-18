@@ -548,10 +548,10 @@ class Ghost {
         
         // If we didn't find a path.
         // (Shouldn't happen...)
-        // then return LEFT.
-        // Worst case the ghost
-        // goes round in circles.
-        int ret = this.LEFT;
+        // then return -1.
+        // The ghost will stop
+        // moving.
+        int ret = -1;
         if (!queue.isEmpty()) {
             // backtrack to find the node
             // leading to the shortest
@@ -576,7 +576,9 @@ class Ghost {
     }
 
     public void moveToPacman(int[] map, int x, int y) {
-        this.direction = findShortestPath(map,x,y);
+        if (this.x % 30 == 0 && this.y % 30 == 0) { // decide next direction
+            this.direction = findShortestPath(map,x,y);
+        }
         updatePosition();
     }
 }
