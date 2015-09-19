@@ -1,0 +1,76 @@
+Welcome to jPacman
+
+== Game Description ==
+This game is based on the popular Pacman game.
+The objective of the game is to make all of
+the yellow dots dissapear.
+
+When the main character wins/loses, you must
+click the 'x' in the upper right hand
+corner of the window to quit and re-run
+the program to go again. I know it's lame,
+but it's simple. I might add a try-again
+feature later.
+
+GHOSTS:
+There are four ghosts:
+* pink
+* blue
+* orange
+* red
+
+The pink, orange, and red ghosts move
+according to a DFS algorithm. Each ghost
+prefers a different order of directions
+in the set (LEFT, RIGHT, UP, DOWN).
+
+A BFS movement algorithm was written
+to support having a ghost find the
+shortest path to chase pacman, but
+it isn't being used. You can enable
+it experimentally if you want. It
+makes the game a lot less playable
+because you have one ghost that's
+always on your tail.
+
+MAIN CHARACTER:
+There is one yellow character, which
+the player can control. The yellow
+character does an eating animation.
+
+DOTS:
+There are 157 dots in the game.
+When the main character comes
+in contact with the yellow dots,
+they dissapear.
+
+CONTROLS:
+The arrow keys move the main
+character.
+When the game ends, click the
+'x' in the window to quit the
+program.
+Not much else to say.
+
+== Installation Instructions ==
+The steps to compile and run this
+game are extremely simple. There
+are no dependencies on anything but
+java. As long as you have the java
+jdk installed, then you can compile
+and run this program. You'll want to
+make sure that both 'java' and 'javac'
+are in the path.
+This project uses the make utility.
+To download and compile the code,
+perform the following steps:
+
+ git clone http://github.com/snowpuppy/jPacman.git
+ cd jPacman/src
+ make
+
+To start playing the game, simply do the following:
+ make run
+
+
+HAVE FUN!
