@@ -58,6 +58,12 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
     // The timer
     public static Timer redrawTimer = null;
 
+    // Game state variable
+    public static final int PLAYING = 0;
+    public static final int WON = 1;
+    public static final int LOST = 2;
+    private static int gameState = PLAYING;
+
     // Move variable for pacman
     public int moveDirection = -1;
     // There are 164 dots. Subtract 4 for ghosts,
@@ -69,6 +75,8 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
     Dot[] dotMap = new Dot[m.length];
     Dot[] dots = new Dot[157];
     Image maze = Toolkit.getDefaultToolkit().getImage("../images/maze.png");
+    Image winImage = Toolkit.getDefaultToolkit().getImage("../images/winImage.png");
+    Image loseImage = Toolkit.getDefaultToolkit().getImage("../images/loseImage.png");
     Pacman pacman = new Pacman(Toolkit.getDefaultToolkit().getImage("../images/pacman.png"), 360, 420);
     Ghost blinky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/blinky.png"), 330, 270);
     Ghost pinky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/pinky.png"), 330, 300);
@@ -115,30 +123,39 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
     }
 
     public void paint(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
 
-        g2.drawImage(maze, 0, 0, this);
-        // Draw all of the dots if they should be
-        // shown.
-        for (int i = 0; i < dots.length; i++) {
-            if (dots[i].show == true) {
-                g2.drawImage(dots[i].image, dots[i].x, dots[i].y, this);
+        Graphics2D g2 = (Graphics2D) g;
+        if (gameState == this.PLAYING) {
+
+            g2.drawImage(maze, 0, 0, this);
+            // Draw all of the dots if they should be
+            // shown.
+            for (int i = 0; i < dots.length; i++) {
+                if (dots[i].show == true) {
+                    g2.drawImage(dots[i].image, dots[i].x, dots[i].y, this);
+                }
             }
+            g2.drawImage(pacman.image, pacman.x, pacman.y, pacman.x+pacman.w, pacman.y+pacman.h,
+                    pacman.fx, pacman.fy, pacman.fx+pacman.w, pacman.fy+pacman.h, this);
+            g2.drawImage(blinky.image, blinky.x, blinky.y, this);
+            g2.drawImage(pinky.image, pinky.x, pinky.y, this);
+            g2.drawImage(inky.image, inky.x, inky.y, this);
+            g2.drawImage(clyde.image, clyde.x, clyde.y, this);
+        } else if (gameState == this.WON) {
+            g2.drawImage(winImage,0,0,this);
+        } else if (gameState == this.LOST) {
+            g2.drawImage(loseImage,0,0,this);
         }
-        g2.drawImage(pacman.image, pacman.x, pacman.y, pacman.x+pacman.w, pacman.y+pacman.h,
-                                   pacman.fx, pacman.fy, pacman.fx+pacman.w, pacman.fy+pacman.h, this);
-        g2.drawImage(blinky.image, blinky.x, blinky.y, this);
-        g2.drawImage(pinky.image, pinky.x, pinky.y, this);
-        g2.drawImage(inky.image, inky.x, inky.y, this);
-        g2.drawImage(clyde.image, clyde.x, clyde.y, this);
         g2.finalize();
     }
 
     public void actionPerformed(ActionEvent e) {
-        // Move player
-        move();    
-        // Update AI positions
-        moveGhosts();
+        if (gameState == this.PLAYING) {
+            // Move player
+            move();    
+            // Update AI positions
+            moveGhosts();
+        }
         // Re-Draw the screen.
         this.repaint();
     }
@@ -188,7 +205,27 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
         // Move Inky (random direction)
         inky.moveRandom(this.m);
         // Move Clyde (shortest distance to pacman (BFS))
-        clyde.moveToPacman(this.m, pacman.x, pacman.y);
+        //clyde.moveToPacman(this.m, pacman.x, pacman.y);
+        clyde.move(this.m);
+
+        // check for ghost/player collision
+        checkCollision(pinky);
+        checkCollision(blinky);
+        checkCollision(inky);
+        checkCollision(clyde);
+    }
+
+    // Check for collision between pacman
+    // and the ghosts to determine losing
+    // condition. :)
+    private void checkCollision(Ghost ghost) {
+        boolean xCollision = ghost.x+30 > pacman.x &&
+                         ghost.x < pacman.x+30;
+        boolean yCollision = ghost.y+30 > pacman.y &&
+                         ghost.y < pacman.y+30;
+        if (xCollision && yCollision) {
+            gameState = this.LOST;
+        }
     }
 
     private void move() {
@@ -313,8 +350,17 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
             //System.out.println("d.y: " + d.y + " d.y: " + d.h + "d_y: " + d_y );
             int dist = (int) Math.sqrt((p_x - d_x)*(p_x - d_x) + (p_y - d_y)*(p_y - d_y));
             //System.out.println("Dist: " + dist);
-            if (dist < d.w / 2) {
+            if (dist < d.w / 2 && d.visible()) {
                 d.hide();
+                // count the dots we're
+                // hiding and if it's the
+                // same as the number of
+                // dots available, then
+                // they're all hidden!
+                Dot.numHidden++;
+                if (d.numHidden >= dots.length) {
+                    gameState = this.WON;
+                }
             }
         }
     }
@@ -593,6 +639,7 @@ class Ghost {
 
 class Dot {
     public static Image image = Toolkit.getDefaultToolkit().getImage("../images/dot.png");
+    public static int numHidden = 0;
     public int x,y;
     public int w=30, h=30;
     public boolean show = true;
@@ -600,6 +647,10 @@ class Dot {
     public Dot(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public boolean visible() {
+        return show;
     }
 
     public void hide() {
