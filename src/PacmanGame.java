@@ -74,14 +74,14 @@ class PacmanCanvas extends JComponent implements ActionListener, KeyListener {
     // on the dots.
     Dot[] dotMap = new Dot[m.length];
     Dot[] dots = new Dot[157];
-    Image maze = Toolkit.getDefaultToolkit().getImage("../images/maze.png");
-    Image winImage = Toolkit.getDefaultToolkit().getImage("../images/winImage.png");
-    Image loseImage = Toolkit.getDefaultToolkit().getImage("../images/loseImage.png");
-    Pacman pacman = new Pacman(Toolkit.getDefaultToolkit().getImage("../images/pacman.png"), 360, 420);
-    Ghost blinky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/blinky.png"), 330, 270);
-    Ghost pinky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/pinky.png"), 330, 300);
-    Ghost inky = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/inky.png"), 360, 270);
-    Ghost clyde = new Ghost(Toolkit.getDefaultToolkit().getImage("../images/clyde.png"), 360, 300);
+    Image maze = Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/maze.png"));
+    Image winImage = Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/winImage.png"));
+    Image loseImage = Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/loseImage.png"));
+    Pacman pacman = new Pacman(Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/pacman.png")), 360, 420);
+    Ghost blinky = new Ghost(Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/blinky.png")), 330, 270);
+    Ghost pinky = new Ghost(Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/pinky.png")), 330, 300);
+    Ghost inky = new Ghost(Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/inky.png")), 360, 270);
+    Ghost clyde = new Ghost(Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/clyde.png")), 360, 300);
 
     public PacmanCanvas() {
         super();
@@ -638,7 +638,7 @@ class Ghost {
 }
 
 class Dot {
-    public static Image image = Toolkit.getDefaultToolkit().getImage("../images/dot.png");
+    public static Image image = Toolkit.getDefaultToolkit().getImage(PacmanGame.class.getResource("images/dot.png"));
     public static int numHidden = 0;
     public int x,y;
     public int w=30, h=30;
