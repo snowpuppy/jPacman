@@ -1,5 +1,5 @@
 Name:		jpacman
-Version:	1.1
+Version:	1.2
 Release:	1
 Summary:	A java swing implementation of pacman.
 
