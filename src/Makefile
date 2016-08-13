@@ -1,10 +1,8 @@
 build:
 	javac PacmanGame.java
 	jar -cmvf META-INF/MANIFEST.MF PacmanGame.jar  ../images *.class
-	cp pacmangame.sh pacmangame
-	chmod u+x pacmangame
-DrawImage.class: build
-run: PacmanGame.class
+PacmanGame.jar: build
+run: PacmanGame.jar
 	java -jar PacmanGame.jar
 clean:
 	rm *.class

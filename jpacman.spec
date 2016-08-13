@@ -1,12 +1,12 @@
 Name:		jpacman
-Version:	1.0.0
+Version:	1.1
 Release:	1
 Summary:	A java swing implementation of pacman.
 
 Group:		Amusements/Games
 License:	GPL
 URL:		http://github.com/snowpuppy/jPacman
-Source0:	http://github.com/snowpuppy/jPacman/archive/v1.0.tar.gz
+Source0:	http://github.com/snowpuppy/jPacman/archive/v1.1.tar.gz
 
 BuildRequires:	java-devel
 Requires:	java
@@ -19,7 +19,7 @@ If you modify the code, you can add strange AI behaviors
 for the ghosts. :)
 
 %prep
-%setup -q -n jPacman-1.0
+%setup -q -n jPacman-%{version}
 
 
 %build
