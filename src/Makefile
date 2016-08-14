@@ -8,7 +8,7 @@ clean:
 	rm *.class
 install:
 	install PacmanGame.jar $(DESTDIR)/usr/lib
-	echo "java -jar $(DESTDIR)/usr/lib/PacmanGame.jar" > pacmangame
+	echo "java -jar /usr/lib/PacmanGame.jar" > pacmangame
 	chmod u+x pacmangame
 	install pacmangame $(DESTDIR)/usr/bin
 uninstall:

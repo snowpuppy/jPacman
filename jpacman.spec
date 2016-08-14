@@ -1,12 +1,12 @@
 Name:		jpacman
-Version:	1.2
+Version:	1.3
 Release:	1
 Summary:	A java swing implementation of pacman.
 
 Group:		Amusements/Games
 License:	GPL
 URL:		http://github.com/snowpuppy/jPacman
-Source0:	http://github.com/snowpuppy/jPacman/archive/v1.1.tar.gz
+Source0:	http://github.com/snowpuppy/jPacman/archive/v%{version}.tar.gz
 
 BuildRequires:	java-devel
 Requires:	java
@@ -30,11 +30,15 @@ make
 %install
 rm -rf $RPM_BUILD_ROOT
 
+cd src/
+mkdir -p $RPM_BUILD_ROOT/usr/bin
+mkdir -p $RPM_BUILD_ROOT/usr/lib
 %make_install
 
 %files
 %doc README
-
+/usr/lib/PacmanGame.jar
+/usr/bin/pacmangame
 
 
 %changelog
